@@ -98,7 +98,7 @@ contract InternetNativeCompanyGuard is Ownable, BaseGuard {
         // solhint-disable-next-line no-unused-vars
         address payable,
         bytes memory,
-        address msgSender
+        address
     ) external override {
         console.log("safe address is msg.sender:", msg.sender);
         if (unlockedSafe[msg.sender]) {
