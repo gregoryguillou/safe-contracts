@@ -20,6 +20,8 @@ contract InternetNativeCompanyGuard is Ownable, BaseGuard {
         bool fallbackAllowed,
         bool valueAllowed
     );
+    event UnlockSafe(address safe);
+    event LockSafe(address safe);
     event SetFunctionAllowedOnTarget(
         address target,
         bytes4 functionSig,
@@ -37,6 +39,17 @@ contract InternetNativeCompanyGuard is Ownable, BaseGuard {
 
     mapping(address => Target) public allowedTargets;
     mapping(address => bool) public unlockedSafe;
+
+    function unlockSafe(address safe) public onlyOwner {
+        console.log("unlock safe:", safe);
+        unlockedSafe[safe] = true;
+        emit UnlockSafe(safe);
+    }
+
+    function lockSafe(address safe) public onlyOwner {
+        unlockedSafe[safe] = false;
+        emit LockSafe(safe);
+    }
 
     function setTargetProperties(address target, bool allow, bool scope, bool delegateCallAllow, bool fallbackAllow, bool valueAllow) public onlyOwner {
         allowedTargets[target].allowed = allow;
@@ -83,9 +96,9 @@ contract InternetNativeCompanyGuard is Ownable, BaseGuard {
         uint256,
         address,
         // solhint-disable-next-line no-unused-vars
-        address payable refundReceiver,
+        address payable,
         bytes memory,
-        address
+        address msgSender
     ) external override {
         console.log("safe address is msg.sender:", msg.sender);
         if (unlockedSafe[msg.sender]) {

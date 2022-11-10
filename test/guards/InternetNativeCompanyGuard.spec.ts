@@ -18,7 +18,8 @@ describe("InternetNativeCompanyGuard", async () => {
       await deployments.fixture();
       const safe = await getSafeWithOwners([user1.address]);
       const guardFactory = await hre.ethers.getContractFactory(
-        "InternetNativeCompanyGuard"
+        "InternetNativeCompanyGuard",
+        user1
       );
       const guard = await guardFactory.deploy();
       const mock = await getMock();
@@ -99,6 +100,27 @@ describe("InternetNativeCompanyGuard", async () => {
       );
 
       await expect(executeTxWithSigners(safe, safeTx, [user1])).to.be.reverted;
+    });
+
+    it("should succeed with 1 signer and unlockedSafe", async () => {
+      const { safe, mock, guard } = await setupSimpleOwnerTests();
+      const nonce = await safe.nonce();
+      const safeTx = buildSafeTransaction({
+        to: mock.address,
+        data: "0xbaddad42",
+        nonce,
+      });
+      await expect(await guard.unlockSafe(safe.address))
+        .to.emit(guard, "UnlockSafe")
+        .withArgs(safe.address);
+      const safeTxHash = calculateSafeTransactionHash(
+        safe,
+        safeTx,
+        await chainId()
+      );
+
+      await expect(executeTxWithSigners(safe, safeTx, [user1])).not.to.be
+        .reverted;
     });
 
     it("should succeed with 2 signers", async () => {
