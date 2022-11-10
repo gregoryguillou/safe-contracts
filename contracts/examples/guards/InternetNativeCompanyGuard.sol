@@ -4,6 +4,7 @@ pragma solidity >=0.8.0 <0.9.0;
 import "../../common/Enum.sol";
 import "../../base/GuardManager.sol";
 import "../../GnosisSafe.sol";
+import "hardhat/console.sol";
 
 /// @title Debug Transaction Guard - A guard that will emit events with extended information.
 /// @notice This guard is only meant as a development tool and example
@@ -26,9 +27,18 @@ contract InternetNativeCompanyGuard is BaseGuard {
         address gasToken,
         // solhint-disable-next-line no-unused-vars
         address payable refundReceiver,
-        bytes memory,
-        address
-    ) external override {}
+        bytes memory signatures,
+        address msgSender
+    ) external override {
+          console.log("safe address is msg.sender:", msg.sender);
+          console.log("signatures are:");
+          console.logBytes(signatures); 
+          (bool success, bytes memory result) = msg.sender.call(abi.encodeWithSignature("getThreshold()"));
+          require(success, "You should be able to succesfully get the safe threshold");
+          (uint _threshold) = abi.decode(result, (uint));
+          console.log("current safe threshold:", _threshold);
+          require(_threshold > 1, "You must have at least 2 signers to execute a transaction");
+    }
 
     function checkAfterExecution(bytes32 txHash, bool success) external override {}
 }
