@@ -59,6 +59,7 @@ if (
 }
 
 import "./src/tasks/local_verify";
+import "./src/tasks/mnemonic";
 import "./src/tasks/deploy_contracts";
 import "./src/tasks/show_codesize";
 import { BigNumber } from "@ethersproject/bignumber";
