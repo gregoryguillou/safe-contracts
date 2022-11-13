@@ -82,5 +82,9 @@
   },
   "peerDependencies": {
     "ethers": "^5.1.4"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts-upgradeable": "^4.8.0",
+    "openzeppelin4": "npm:@openzeppelin/contracts@4.8.0"
   }
 }
